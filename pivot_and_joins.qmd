@@ -1,0 +1,102 @@
+---
+title: "Pivot Longer and Wider"
+format: html
+editor: visual
+---
+
+- `pivot_longer` is used to transform the data from wide format to long format (also known as melting). It's useful when you want to make your data tidy for easier analysis. In tidy data, each variable forms a column and each observation forms a row.
+
+- `pivot_wider` is used to transform the data from long format to wide format (also known as casting). It's useful when you want to spread out a variable into multiple columns for a more compact view of the data.
+
+Let's start by creating the data frames and then reshaping them:
+
+```{r setup}
+# Load the tidyverse package
+library(tidyverse)
+```
+
+
+```{r}
+# Create a data frame for the student roster
+student_roster <- tibble(
+  student_id = 1:7,
+  student_name = c("Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace")
+)
+```
+
+
+```{r}
+# Create a data frame for the question characteristics
+question_characteristics <- tibble(
+  question_id = c(1:5, 1:5),
+  question_text = c(paste0("Q", 1:5), paste0("Q", 1:5)),
+  max_score = c(rep(5,5), rep(10,5)) ,
+  difficulty = c(c("easy", "medium", "hard", "medium", "easy"), 
+                 c("hard", "medium", "easy", "hard", "medium")),
+  subject = c(c("math", "science", "english", "math", "science"), 
+              c("english", "math", "science", "english", "math")),
+  exam_type = c(rep("quiz", 5), rep("midterm", 5))
+                
+  
+)
+```
+
+
+```{r}
+# Create a data frame for the student responses in wide format
+student_responses_wide <- tibble(
+  student_id = 1:7,
+  Q1 = sample(0:5, 7, replace = TRUE),
+  Q2 = sample(0:5, 7, replace = TRUE),
+  Q3 = sample(0:5, 7, replace = TRUE),
+  Q4 = sample(0:5, 7, replace = TRUE),
+  Q5 = sample(0:5, 7, replace = TRUE),
+  type = rep("quiz", 7),
+)
+```
+
+
+```{r}
+# Pivot the student responses to long format
+student_responses_long <- student_responses_wide%>% 
+  # select(-type) %>%
+  pivot_longer(
+    cols = starts_with("Q"),
+    names_to = "question_text",
+    values_to = "score"
+  ) 
+```
+
+
+```{r}
+# Pivot the student responses back to wide format
+student_responses_wide_again <- student_responses_long %>%
+  pivot_wider(
+    names_from = question_text,
+    values_from = score
+  )
+```
+
+Now, let's use `inner_join` to combine the student responses with the question characteristics, and `left_join` to add the student names:
+
+```{r}
+# Inner join student responses with question characteristics
+combined_data <- student_responses_long %>%
+  inner_join(question_characteristics, by = c("question_text","type" = "exam_type"))
+
+
+
+# Full Join student responses with student questions
+combine_data_full <- student_responses_long %>%
+  full_join(question_characteristics, by = c("question_text","type" = "exam_type"))
+
+
+
+
+
+# Left join combined data with student roster
+final_data <- combined_data %>%
+  left_join(student_roster, by = "student_id")
+```
+
+In this final data frame, each row represents a student's response to a question, along with the characteristics of the question and the student's name. The `inner_join` ensures that we only include responses to questions that we have characteristics for, and the `left_join` ensures that we include all responses, even if we don't have a name for the student. The `pivot_longer` and `pivot_wider` functions allow us to easily reshape the data for different types of analysis.
