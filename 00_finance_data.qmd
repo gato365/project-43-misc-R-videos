@@ -1,0 +1,94 @@
+---
+title: "Analyzing Stock with tidyquant"
+author: "Your Name"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: html_document
+---
+
+
+
+```{r setup, include=FALSE}
+#| message=FALSE, warning=FALSE, echo=FALSE
+# Install and load the spotifyr package
+if (!require(tidyquant)) {
+  install.packages('tidyquant')
+}
+library(tidyquant)
+library(tidyverse)
+```
+
+### Introduction
+
+In this document, we explore the capabilities of the `tidyquant` package to access and analyze financial data. 
+
+
+
+### Step 1a: Get the stock symbols
+```{r}
+tq_exchange_options()
+```
+
+
+### Step 1b: Get the index symbols
+```{r}
+tq_index_options()
+```
+
+
+
+### Step 2: Get the stock symbols for the DOW
+
+
+```{r}
+# Get the stock symbols for DOW
+symbols <- tq_index("DOW") %>%
+  filter(symbol != "-") %>%
+  pull(symbol)
+ 
+```
+
+
+
+
+### Step 3: Specify Dates
+```{r}
+# Get the past  month of stock prices for this company
+end_date <- Sys.Date()
+start_date <- end_date - months(1)
+```
+
+
+```{r}
+stock_prices_df <- tq_get(symbols,
+                       from = start_date,
+                       to = end_date,
+                       get = "stock.prices")
+
+
+```
+
+
+
+```{r}
+stock_prices_df %>% 
+  group_by(symbol) %>%
+  summarise(n()) 
+```
+
+
+
+```{r}
+stock_prices_df %>%
+  filter(symbol %in% c("AAPL","MSFT")) %>%
+ ggplot(aes(x = date, y = adjusted, color = symbol)) +
+  geom_line() +
+  labs(title = "Stock Prices for DOW",
+       x = "Date",
+       y = "Adjusted Price")
+
+```
+
+```{r}
+save(stock_prices_df, , file = "dow30days.RData")
+```
+
