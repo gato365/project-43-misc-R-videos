@@ -1,0 +1,89 @@
+---
+title: "Analyzing geniusr with R"
+author: "Your Name"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: html_document
+---
+
+### Vignette: Analyzing Drake's "If You're Reading This It's Too Late" with `geniusr`
+
+#### Setup
+
+First, ensure you have `geniusr` installed and loaded. You might also need a Genius API token.
+
+```{r}
+# Install geniusr if you haven't already
+if (!requireNamespace("geniusr", quietly = TRUE)) {
+  install.packages("geniusr")
+}
+
+# Load geniusr
+library(geniusr)
+library(tidyverse)
+
+
+genius_api_token <- Sys.getenv("genius_api_token")
+# Set your Genius API token
+genius_token(genius_api_token)
+```
+
+#### Fetching the Album Data
+
+To analyze the album, we first need to fetch its tracks and lyrics. The `geniusr` package offers functions to search for artists, albums, and song lyrics.
+
+```{r}
+# Search for Drake
+drake <- search_artists("Drake")
+
+# Get album information
+album_info <- get_albums(artist_id = drake$id[1], search = "If You're Reading This It's Too Late")
+
+# Fetch tracks of the album
+album_tracks <- get_album_tracks(album_info$id[1])
+```
+
+#### Analyzing Lyrics
+
+With the track information, we can proceed to fetch and analyze the lyrics. For this example, let's explore the frequency of specific words or themes across the album.
+
+```{r}
+# Function to fetch lyrics and count words
+count_words_in_song <- function(song_id, word) {
+  lyrics <- get_song_lyrics(song_id)
+  sum(str_count(lyrics, ignore_case(word)))
+}
+
+# Example: Count occurrences of the word 'love'
+word_counts <- sapply(album_tracks$id, count_words_in_song, word = "love")
+
+# Display the count
+names(word_counts) <- album_tracks$title
+print(word_counts)
+```
+
+#### Visualization
+
+Let's visualize the frequency of the word "love" across the tracks.
+
+```{r}
+library(ggplot2)
+
+# Create a dataframe for plotting
+df <- data.frame(track = names(word_counts), count = word_counts)
+
+# Plot
+ggplot(df, aes(x = reorder(track, -count), y = count)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Frequency of 'love' in 'If You're Reading This It's Too Late'",
+       x = "Track",
+       y = "Count")
+```
+
+#### Conclusion
+
+This vignette demonstrated how to utilize the `geniusr` package to analyze the lyrics of Drake's album "If You're Reading This It's Too Late". By fetching album and track information, and then exploring the lyrics, we can uncover insights about thematic elements across the album.
+
+---
+
+Please, replace `"<your_genius_api_token>"` with your actual Genius API token. This vignette provides a basic framework for lyrical analysis which can be expanded based on specific analytical goals or interests.
