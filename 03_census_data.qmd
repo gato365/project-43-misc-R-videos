@@ -1,0 +1,66 @@
+
+
+https://api.census.gov/data/key_signup.html
+https://www.census.gov/quickfacts/fact/table/
+```{r}
+api_key <- "25a51aebc8cc7e3b63afadedb7572521c320d6d6"
+```
+
+```{r}
+
+# Install necessary packages if not already installed
+if (!require(tidycensus)) install.packages('tidycensus')
+if (!require(ggplot2)) install.packages('ggplot2')
+if (!require(terra)) install.packages('terra')
+if (!require(r2r)) install.packages('r2r')
+
+library(tidycensus)
+library(ggplot2)
+library(terra)
+library(r2r)
+
+
+# Census API Key
+census_api_key(api_key, install=TRUE, overwrite=TRUE)
+readRenviron("~/.Renviron")
+# Define county and state for San Luis Obispo, CA
+county <- "079"  # FIPS code for San Luis Obispo County
+state <- "06"    # FIPS code for California
+year <- 2020     # Year of the decennial census
+# Function 1: Get decennial data for the county
+get_decennial_county <- function(variables, year) {
+  get_decennial(geography = "county", 
+                variables = variables, 
+                state = state, 
+                county = county, 
+                year = year)
+}
+
+# Function 2: Get ACS data for the county
+get_acs_county <- function(variables, year) {
+  get_acs(geography = "county", 
+          variables = variables, 
+          state = state, 
+          county = county, 
+          year = year)
+}
+
+
+race_vars <- c(
+  Hispanic = "P2_002N",
+  White = "P2_005N",
+  Black = "P2_006N",
+  Asian = "P2_008N",
+  AI_AN = "P2_007N", ## American Indian and Alaska Native
+  NH_PI = "P2_009N", ## Native Hawaiian and Other Pacific Islander
+  some_Other = "P2_010N", ## Other
+  Two_or_more = "P2_011N" ## Two or more
+  
+)
+slo_ca_df <- get_decennial(geography = "county", 
+              variables = race_vars, 
+              state = state, 
+              county = county, 
+              year = year)
+```
+

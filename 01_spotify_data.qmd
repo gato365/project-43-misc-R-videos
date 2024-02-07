@@ -17,22 +17,23 @@ if (!require(spotifyr)) {
   install.packages('spotifyr')
 }
 library(spotifyr)
+library(tidyverse)
+```
 
+
+```{r}
 # Set Spotify API credentials
-Sys.setenv(SPOTIFY_CLIENT_ID = 'your_client_id')
-Sys.setenv(SPOTIFY_CLIENT_SECRET = 'your_client_secret')
+Sys.setenv(SPOTIFY_CLIENT_ID = '407eef83d82a43529c0b9c9f8501f92a')
+Sys.setenv(SPOTIFY_CLIENT_SECRET = '25068fa2842841ada2bd31a2a1eb7f28')
 
 # Authenticate with Spotify API
 access_token <- get_spotify_access_token()
+```
 
+
+```{r}
 # Search for a track
-track <- get_track_audio_features('Never Gonna Give You Up')
-
-# Print track features
-print(track)
+artist_df <- get_artist_audio_features("Taylor Swift")
 ```
 
-In this example, we authenticate with the Spotify API, search for a specific track ('Never Gonna Give You Up'), and print its audio features. You can replace the track name with any other track to get its features.
-```
 
-Please note that the `spotifyr` package requires you to have a Spotify Developer account and to set up an application to get the necessary client ID and client secret. Also, the `get_track_audio_features` function may not work if the track is not available in the Spotify catalog in your region. You can find more information about the `spotifyr` package and its functions in its [documentation](https://www.rdocumentation.org/packages/spotifyr/versions/2.2.3).
