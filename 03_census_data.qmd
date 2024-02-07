@@ -1,51 +1,69 @@
+---
+title: "Census Data Retrieval for San Luis Obispo County, CA"
+output: html_document
+---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-https://api.census.gov/data/key_signup.html
-https://www.census.gov/quickfacts/fact/table/
+## Introduction
+
+This vignette demonstrates how to retrieve decennial Census data for San Luis Obispo County, California using the `tidycensus` package in R.
+
+## Step 1: Get API Key
+
+First, you need to obtain an API key from the U.S. Census Bureau. You can sign up for a free API key at [Census Bureau API Key Signup](https://api.census.gov/data/key_signup.html).
+
 ```{r}
+# Replace with your actual API key
 api_key <- "25a51aebc8cc7e3b63afadedb7572521c320d6d6"
 ```
 
-```{r}
+## Step 2: Install and Load Necessary Packages
 
+Next, install and load the necessary packages. If the packages are already installed, this step will just load them.
+
+```{r}
 # Install necessary packages if not already installed
 if (!require(tidycensus)) install.packages('tidycensus')
 if (!require(ggplot2)) install.packages('ggplot2')
 if (!require(terra)) install.packages('terra')
 if (!require(r2r)) install.packages('r2r')
 
+# Load the packages
 library(tidycensus)
 library(ggplot2)
 library(terra)
 library(r2r)
+```
 
+## Step 3: Set Census API Key
 
-# Census API Key
+Set the Census API key. This step is necessary to authenticate your requests to the Census API.
+
+```{r}
+# Set Census API key
 census_api_key(api_key, install=TRUE, overwrite=TRUE)
 readRenviron("~/.Renviron")
+```
+
+## Step 4: Define Parameters
+
+Define the parameters for the data retrieval. In this case, we're interested in data for San Luis Obispo County, California from the 2020 decennial Census.
+
+```{r}
 # Define county and state for San Luis Obispo, CA
 county <- "079"  # FIPS code for San Luis Obispo County
 state <- "06"    # FIPS code for California
 year <- 2020     # Year of the decennial census
-# Function 1: Get decennial data for the county
-get_decennial_county <- function(variables, year) {
-  get_decennial(geography = "county", 
-                variables = variables, 
-                state = state, 
-                county = county, 
-                year = year)
-}
+```
 
-# Function 2: Get ACS data for the county
-get_acs_county <- function(variables, year) {
-  get_acs(geography = "county", 
-          variables = variables, 
-          state = state, 
-          county = county, 
-          year = year)
-}
+## Step 5: Define Variables
 
+Define the variables you're interested in. These correspond to specific racial and ethnic categories.
 
+```{r}
 race_vars <- c(
   Hispanic = "P2_002N",
   White = "P2_005N",
@@ -55,8 +73,14 @@ race_vars <- c(
   NH_PI = "P2_009N", ## Native Hawaiian and Other Pacific Islander
   some_Other = "P2_010N", ## Other
   Two_or_more = "P2_011N" ## Two or more
-  
 )
+```
+
+## Step 6: Retrieve Data
+
+Finally, retrieve the data using the `get_decennial` function from the `tidycensus` package.
+
+```{r}
 slo_ca_df <- get_decennial(geography = "county", 
               variables = race_vars, 
               state = state, 
@@ -64,3 +88,6 @@ slo_ca_df <- get_decennial(geography = "county",
               year = year)
 ```
 
+## Conclusion
+
+You now have a data frame `slo_ca_df` that contains the decennial Census data for San Luis Obispo County, California. You can use this data for further analysis or visualization.
