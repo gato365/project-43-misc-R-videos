@@ -46,7 +46,9 @@ p1 <- rec_table_df %>%
   theme_minimal() +
   theme(
     legend.position = "none",
-    plot.title = element_text(hjust = 0.5, face = "bold", size = 17)
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 17),
+        axis.title = element_text(size= 15, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1,size =10, face = "bold")
   )
 ```
 
@@ -85,10 +87,9 @@ ggplot( aes(x = album_name, y = energy, fill = album_name)) +
   theme_minimal() +
   theme(
     plot.title = element_text(hjust = 0.5, face = "bold", size = 17),
+    axis.title = element_text(size= 15, face = "bold"),
     axis.text.x = element_text(angle = 45, hjust = 1,size =10, face = "bold"),
-    legend.position = "none",
-    axis.title = element_text(size= 15, face = "bold")
-    
+    legend.position = "none"
   )
 
 # Add Source of top albums: https://ew.com/music/taylor-swift-albums-ranked/
