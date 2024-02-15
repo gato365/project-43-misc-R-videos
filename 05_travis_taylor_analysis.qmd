@@ -1,0 +1,102 @@
+
+
+
+
+```{r setup, include=FALSE}
+library(rvest)
+library(spotifyr)
+library(tidyverse)
+```
+
+```{r}
+type_info <- "receiving"; year <- 2023
+url <- paste0("https://www.pro-football-reference.com/years/",year,"/",type_info,".htm")
+webpage <- read_html(url)
+table <- html_node(webpage, "table")
+table_df <- html_table(table)
+```
+
+
+
+```{r}
+rec_table_df <- table_df %>% 
+  filter(Rk != "Rk") %>%
+  mutate(`Ctch%` = str_remove(`Ctch%`, "\\%")) %>% 
+  mutate_at(vars(G:Fmb), as.numeric) %>% 
+  mutate(Player = str_remove_all(Player,"\\*|\\+"))
+```
+
+
+
+
+
+```{r}
+p1 <- rec_table_df %>% 
+  ggplot(aes(x = Yds, y = `1D`, color = Player)) +
+  geom_point(aes(size = ifelse(Player %in% c("Travis Kelce", "Zay Flowers", "Tyreek Hill"), 2.5, 1))) +
+  scale_color_manual(values = c("Travis Kelce" = "red", "Zay Flowers" = "black", "Tyreek Hill" = "black")) +
+  geom_text(data = subset(rec_table_df, Player %in% c("Zay Flowers", "Tyreek Hill", "Travis Kelce")), aes(label = Player), nudge_x = -3,nudge_y = 5.5, check_overlap = TRUE) +
+  labs(
+    title = "Comparing Travis Kelce's\nPerformance with Peers in 2023",
+    x = "Yards",
+    y = "First Downs"
+  ) +
+  xlim(0,2000) +
+  ylim(0,92) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 17)
+  )
+```
+
+
+
+```{r}
+# Set Spotify API credentials
+Sys.setenv(SPOTIFY_CLIENT_ID = '5f6b196bc02e44edaeade729a7fe0990')
+Sys.setenv(SPOTIFY_CLIENT_SECRET = '42be9a869c2e4e68964767423760bf54')
+
+# Authenticate with Spotify API
+access_token <- get_spotify_access_token()
+```
+
+
+```{r}
+# Search for a track
+artist_df <- get_artist_audio_features("Taylor Swift")
+```
+
+
+
+```{r}
+library(ggplot2)
+p2 <- artist_df %>% 
+  filter(album_name %in% c("Taylor Swift", "Speak Now", "evermore", "folklore")) %>% 
+ggplot( aes(x = album_name, y = energy, fill = album_name)) +
+  geom_violin(trim = FALSE) +
+  stat_summary(fun = mean, geom = "point", shape = 20, size = 6, color = "red") +
+  labs(
+    title = "Energy Distribution of\n Taylor Swift's Top Albums",
+    fill = "The Mean Energy Level",
+    x = "Album Name",
+    y = "Energy"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 17),
+    axis.text.x = element_text(angle = 45, hjust = 1,size =10, face = "bold"),
+    legend.position = "none",
+    axis.title = element_text(size= 15, face = "bold")
+    
+  )
+
+# Add Source of top albums: https://ew.com/music/taylor-swift-albums-ranked/
+```
+
+```{r}
+gridExtra::grid.arrange(p1,p2, ncol = 2)
+
+```
+
+

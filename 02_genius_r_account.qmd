@@ -22,9 +22,9 @@ library(geniusr)
 library(tidyverse)
 
 
-genius_api_token <- Sys.getenv("genius_api_token")
+genius_api_token <- "B9bjEloDMd3OJK0D2hap9lzZEh8x48WY1emgEOUSyYlH3bd3Iler_tbIPAJnDxKJ"
 # Set your Genius API token
-genius_token(genius_api_token)
+genius_token("B9bjEloDMd3OJK0D2hap9lzZEh8x48WY1emgEOUSyYlH3bd3Iler_tbIPAJnDxKJ", force = TRUE)
 ```
 
 #### Fetching the Album Data

@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 This vignette demonstrates how to retrieve decennial Census data for San Luis Obispo County, California using the `tidycensus` package in R.
 
+Website for [Census data](https://www.census.gov/quickfacts/fact/table/)
+
 ## Step 1: Get API Key
 
 First, you need to obtain an API key from the U.S. Census Bureau. You can sign up for a free API key at [Census Bureau API Key Signup](https://api.census.gov/data/key_signup.html).
